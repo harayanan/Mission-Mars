@@ -508,7 +508,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.15)}
 }
 .landing-title .pre{font-size:16px;color:#8ec8f8;letter-spacing:4px;text-transform:uppercase;display:block;margin-bottom:4px;font-weight:700}
 .landing-title .main{
-  font-size:52px;display:block;letter-spacing:6px;text-transform:uppercase;
+  font-size:42px;display:block;letter-spacing:4px;text-transform:uppercase;
   background:linear-gradient(135deg,#ff9a56,#ff6b35,#ff4444);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
@@ -586,7 +586,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.15)}
 
 /* ===== RESPONSIVE ===== */
 @media(max-width:380px){
-  .landing-title .main{font-size:42px;letter-spacing:4px}
+  .landing-title .main{font-size:34px;letter-spacing:3px}
   .mars-hero{width:160px;height:160px}
   .invest-grid{grid-template-columns:repeat(3,1fr);gap:6px}
   .invest-tile{padding:10px 6px}

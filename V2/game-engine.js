@@ -299,7 +299,8 @@ function renderChallengeInteraction(phase) {
   const inter = phase.interaction || (phase.type === 'challenge' ? phase.interaction : null);
   if (!inter) return;
 
-  let html = `<div class="section-header anim-slide">
+  let html = `<button class="btn btn-ghost anim-fade" onclick="goBackFromInteraction('${phase.id}')" style="margin-bottom:8px">← Back to briefing</button>`;
+  html += `<div class="section-header anim-slide">
     <div class="section-badge">${phase.badge}</div>
     <div class="section-title">${phase.title}</div>
   </div>`;
@@ -632,8 +633,9 @@ function renderRecap(phase) {
     <p style="font-size:13px;color:rgba(255,255,255,.5);margin-top:8px">It's not about how MUCH you earn — it's about how EARLY you start and how CONSISTENTLY you invest.</p>
   </div>`;
 
-  html += `<div style="text-align:center;margin-top:20px">
+  html += `<div style="text-align:center;margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:10px">
     <button class="btn btn-primary btn-lg anim-slide" onclick="advancePhase()">See My Results →</button>
+    <button class="btn btn-ghost anim-slide" onclick="goBack()">← Back</button>
   </div>`;
 
   renderScreen(html);
@@ -753,6 +755,12 @@ function goBack() {
   }
 }
 
+function goBackFromInteraction(phaseId) {
+  // Go back to the challenge intro (same phase, just re-render intro)
+  const phase = PHASES.find(p => p.id === phaseId);
+  if (phase) renderChallengeIntro(phase);
+}
+
 // ===== LANDING =====
 function renderLanding() {
   showHud(false); showNav(false);
@@ -764,7 +772,7 @@ function renderLanding() {
     </div>
     <div class="landing-title anim-slide">
       <span class="pre">Welcome to</span>
-      <span class="main">MARS</span>
+      <span class="main">Mission Mars</span>
     </div>
     <p class="landing-desc anim-slide-delay-1">An epic space adventure that teaches you the secrets of money, saving, investing, and financial success!</p>
     <div class="landing-features anim-slide-delay-2">
@@ -793,6 +801,7 @@ function showNameEntry() {
     <p class="anim-slide-delay-2" style="color:rgba(255,255,255,.5);font-size:13px;max-width:280px">This will appear on your certificate of completion.</p>
     <input class="name-input anim-slide-delay-2" type="text" id="nameInput" placeholder="Your name..." maxlength="24" autocomplete="off">
     <button class="btn btn-primary btn-lg anim-slide-delay-3" id="nameSubmitBtn" onclick="submitName()">Begin Mission →</button>
+    <button class="btn btn-ghost anim-slide-delay-3" onclick="renderLanding()">← Back</button>
   </div>`;
 
   renderScreen(html);
