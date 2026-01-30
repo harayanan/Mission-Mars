@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Mission Mars - Financial Literacy Adventure</title>
+<style>
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-tap-highlight-color:transparent}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0a0e27;color:#fff;overflow-x:hidden;min-height:100vh;min-height:100dvh}
+
+/* ===== STARS BACKGROUND ===== */
+.stars{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.stars span{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) ease-in-out infinite alternate}
+@keyframes twinkle{0%{opacity:.2;transform:scale(.8)}100%{opacity:1;transform:scale(1.2)}}
+
+/* ===== GAME CONTAINER ===== */
+.game{position:relative;z-index:1;max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+
+/* ===== TOP BAR ===== */
+.topbar{display:none;padding:12px 16px;background:rgba(10,14,39,.9);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.1);position:sticky;top:0;z-index:10;gap:8px;align-items:center;justify-content:space-between}
+.topbar.active{display:flex}
+.topbar .player-name{font-size:13px;color:#8ec8f8;font-weight:600}
+.topbar .water-display{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:#4fc3f7}
+.topbar .water-display .bottle-icon{font-size:18px}
+.topbar .progress-bar{flex:1;max-width:120px;height:6px;background:rgba(255,255,255,.15);border-radius:3px;overflow:hidden}
+.topbar .progress-bar .fill{height:100%;background:linear-gradient(90deg,#ff6b35,#ff9a56);border-radius:3px;transition:width .6s ease}
+
+/* ===== SCREENS ===== */
+.screen{display:none;flex:1;flex-direction:column;padding:20px 20px 40px;animation:fadeSlideIn .5s ease}
+.screen.active{display:flex}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== LANDING SCREEN ===== */
+.landing{align-items:center;justify-content:center;text-align:center;gap:24px;background:radial-gradient(ellipse at 50% 80%,rgba(180,60,30,.25),transparent 70%)}
+.landing .mars-planet{width:180px;height:180px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#e8845a,#c0522a 50%,#8b3418 100%);box-shadow:0 0 60px rgba(200,80,40,.4),inset -20px -10px 30px rgba(0,0,0,.4);animation:float 6s ease-in-out infinite}
+.landing .mars-planet::after{content:'';position:absolute;width:30%;height:15%;background:rgba(0,0,0,.15);border-radius:50%;top:40%;left:25%}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+.landing h1{font-size:32px;font-weight:900;letter-spacing:2px;background:linear-gradient(135deg,#ff9a56,#ff6b35,#ff4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-transform:uppercase;line-height:1.1}
+.landing h1 span{display:block;font-size:48px;letter-spacing:6px}
+.landing .tagline{font-size:15px;color:#8ec8f8;line-height:1.5;max-width:300px}
+.landing .start-btn{margin-top:10px}
+
+/* ===== BUTTONS ===== */
+.btn{padding:14px 36px;border:none;border-radius:30px;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:1px;position:relative;overflow:hidden}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:linear-gradient(135deg,#ff6b35,#ff4444);color:#fff;box-shadow:0 4px 20px rgba(255,107,53,.4)}
+.btn-primary:hover{box-shadow:0 6px 30px rgba(255,107,53,.6)}
+.btn-secondary{background:rgba(255,255,255,.1);color:#fff;border:2px solid rgba(255,255,255,.3)}
+.btn-secondary:hover{background:rgba(255,255,255,.2)}
+.btn-small{padding:10px 24px;font-size:14px}
+.btn:disabled{opacity:.5;pointer-events:none}
+
+/* ===== NAME INPUT ===== */
+.name-screen{align-items:center;justify-content:center;text-align:center;gap:20px}
+.name-screen .astronaut-emoji{font-size:80px;animation:float 4s ease-in-out infinite}
+.name-screen h2{font-size:24px;font-weight:800;color:#ff9a56}
+.name-screen p{color:#8ec8f8;font-size:14px;max-width:280px;line-height:1.5}
+.input-wrap{position:relative;width:100%;max-width:300px}
+.input-wrap input{width:100%;padding:14px 20px;border-radius:16px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-size:16px;text-align:center;outline:none;transition:border-color .3s}
+.input-wrap input:focus{border-color:#ff6b35}
+.input-wrap input::placeholder{color:rgba(255,255,255,.35)}
+
+/* ===== INTRO / STORY ===== */
+.story-screen{gap:20px}
+.story-screen .story-card{background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:24px;text-align:center}
+.story-screen .story-card h2{font-size:20px;color:#ff9a56;margin-bottom:12px;font-weight:800}
+.story-screen .story-card p{font-size:14px;line-height:1.7;color:rgba(255,255,255,.85)}
+.story-screen .story-card .highlight{color:#4fc3f7;font-weight:700}
+.story-icon{font-size:48px;text-align:center;margin-bottom:8px}
+.rules-list{list-style:none;text-align:left;margin-top:16px}
+.rules-list li{padding:8px 0;font-size:14px;color:rgba(255,255,255,.8);display:flex;align-items:flex-start;gap:10px;line-height:1.5}
+.rules-list li::before{content:'';display:inline-block;width:8px;height:8px;min-width:8px;border-radius:50%;background:#ff6b35;margin-top:6px}
+.story-nav{display:flex;gap:12px;margin-top:auto;padding-top:20px}
+.story-nav .btn{flex:1}
+
+/* ===== CHALLENGE SCREEN ===== */
+.challenge-screen{gap:16px}
+.challenge-header{text-align:center}
+.challenge-badge{display:inline-block;padding:6px 16px;border-radius:20px;background:linear-gradient(135deg,#ff6b35,#ff4444);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.challenge-header h2{font-size:22px;font-weight:800;line-height:1.3}
+.challenge-scene{background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:20px;position:relative;overflow:hidden}
+.challenge-scene .scene-icon{font-size:56px;text-align:center;margin-bottom:12px}
+.challenge-scene p{font-size:14px;line-height:1.7;color:rgba(255,255,255,.85)}
+.challenge-scene .emphasis{color:#ff9a56;font-weight:700}
+.challenge-question{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:16px;padding:16px;text-align:center;font-size:16px;font-weight:700;color:#ff9a56;line-height:1.4}
+
+/* ===== CHOICE OPTIONS ===== */
+.choices{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.choice-btn{width:100%;padding:16px 20px;border-radius:16px;border:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#fff;font-size:15px;text-align:left;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:12px;line-height:1.4}
+.choice-btn:hover{border-color:rgba(255,107,53,.5);background:rgba(255,107,53,.1)}
+.choice-btn:active{transform:scale(.98)}
+.choice-btn .choice-letter{width:32px;height:32px;min-width:32px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#ff9a56}
+.choice-btn.selected{border-color:#ff6b35;background:rgba(255,107,53,.15)}
+.choice-btn.selected .choice-letter{background:#ff6b35;color:#fff}
+.choice-btn.correct{border-color:#4caf50;background:rgba(76,175,80,.15);animation:pulse-green .5s}
+.choice-btn.wrong{border-color:#f44336;background:rgba(244,67,54,.1);animation:shake .4s}
+@keyframes pulse-green{0%,100%{box-shadow:none}50%{box-shadow:0 0 20px rgba(76,175,80,.3)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+/* ===== SLIDER INPUT ===== */
+.slider-input{text-align:center}
+.slider-input .slider-value{font-size:48px;font-weight:900;color:#4fc3f7;margin-bottom:4px}
+.slider-input .slider-label{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:12px}
+.slider-input input[type=range]{width:100%;height:6px;-webkit-appearance:none;appearance:none;background:rgba(255,255,255,.15);border-radius:3px;outline:none}
+.slider-input input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#ff6b35,#ff4444);cursor:pointer;box-shadow:0 2px 10px rgba(255,107,53,.4)}
+
+/* ===== WATER VISUALIZATION ===== */
+.water-viz{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;padding:12px 0}
+.water-viz .bottle{width:24px;height:40px;border-radius:4px 4px 8px 8px;background:rgba(255,255,255,.1);position:relative;transition:all .3s}
+.water-viz .bottle.filled{background:linear-gradient(to top,#29b6f6,#4fc3f7);box-shadow:0 0 8px rgba(79,195,247,.3)}
+.water-viz .bottle.consumed{background:linear-gradient(to top,rgba(255,107,53,.6),rgba(255,152,0,.4))}
+.water-viz .bottle::before{content:'';position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:10px;height:6px;background:inherit;border-radius:2px 2px 0 0}
+
+/* ===== FEEDBACK REVEAL ===== */
+.feedback{animation:fadeSlideIn .5s ease}
+.feedback-card{border-radius:20px;padding:24px;text-align:center;margin-top:8px}
+.feedback-card.good{background:linear-gradient(145deg,rgba(76,175,80,.15),rgba(76,175,80,.05));border:1px solid rgba(76,175,80,.3)}
+.feedback-card.warn{background:linear-gradient(145deg,rgba(255,152,0,.15),rgba(255,152,0,.05));border:1px solid rgba(255,152,0,.3)}
+.feedback-card.bad{background:linear-gradient(145deg,rgba(244,67,54,.15),rgba(244,67,54,.05));border:1px solid rgba(244,67,54,.3)}
+.feedback-card .feedback-icon{font-size:48px;margin-bottom:8px}
+.feedback-card h3{font-size:18px;font-weight:800;margin-bottom:8px}
+.feedback-card.good h3{color:#66bb6a}
+.feedback-card.warn h3{color:#ffa726}
+.feedback-card.bad h3{color:#ef5350}
+.feedback-card p{font-size:14px;line-height:1.6;color:rgba(255,255,255,.8)}
+.lesson-box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;margin-top:12px;text-align:left}
+.lesson-box .lesson-title{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:#ff9a56;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.lesson-box p{font-size:13px;line-height:1.6;color:rgba(255,255,255,.75)}
+
+/* ===== INVESTMENT GRID ===== */
+.invest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.invest-card{border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;border:2px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);transition:all .25s;font-size:12px;line-height:1.3;color:rgba(255,255,255,.8)}
+.invest-card .invest-icon{font-size:28px;margin-bottom:4px}
+.invest-card:hover{border-color:rgba(255,107,53,.4)}
+.invest-card.selected{border-color:#ff6b35;background:rgba(255,107,53,.12);box-shadow:0 0 12px rgba(255,107,53,.2)}
+.invest-card.winner{border-color:#4caf50;background:rgba(76,175,80,.15)}
+.invest-card.winner::after{content:'';position:absolute;top:4px;right:4px;font-size:16px}
+.invest-card.loser{border-color:#f44336;background:rgba(244,67,54,.1);opacity:.6}
+.invest-hint{font-size:12px;color:rgba(255,255,255,.5);text-align:center;margin-top:4px}
+
+/* ===== COMPOUNDING VIZ ===== */
+.compound-viz{display:flex;align-items:flex-end;gap:4px;justify-content:center;height:160px;padding:12px 0}
+.compound-bar{width:28px;border-radius:6px 6px 0 0;background:linear-gradient(to top,#2e7d32,#66bb6a);transition:height .8s cubic-bezier(.34,1.56,.64,1);position:relative}
+.compound-bar .bar-label{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:9px;color:rgba(255,255,255,.6);white-space:nowrap}
+.compound-bar .bar-value{position:absolute;top:-34px;left:50%;transform:translateX(-50%);font-size:10px;color:#66bb6a;font-weight:700;white-space:nowrap}
+
+/* ===== EMOTION METER ===== */
+.emotion-meter{display:flex;justify-content:space-around;padding:12px 0}
+.emotion-btn{font-size:36px;cursor:pointer;transition:transform .2s;border:none;background:none;padding:8px;border-radius:12px}
+.emotion-btn:hover{transform:scale(1.2)}
+.emotion-btn:active{transform:scale(.9)}
+.emotion-btn.selected{background:rgba(255,255,255,.1);transform:scale(1.15)}
+
+/* ===== RECAP SCREEN ===== */
+.recap-screen{gap:16px;align-items:center;text-align:center}
+.recap-screen h2{font-size:26px;font-weight:900;color:#ff9a56}
+.recap-list{width:100%;list-style:none;text-align:left}
+.recap-list li{padding:12px 16px;border-radius:12px;background:rgba(255,255,255,.05);margin-bottom:8px;display:flex;align-items:center;gap:12px;font-size:14px;color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.08);animation:fadeSlideIn .4s ease backwards}
+.recap-list li:nth-child(1){animation-delay:.1s}
+.recap-list li:nth-child(2){animation-delay:.2s}
+.recap-list li:nth-child(3){animation-delay:.3s}
+.recap-list li:nth-child(4){animation-delay:.4s}
+.recap-list li:nth-child(5){animation-delay:.5s}
+.recap-list li:nth-child(6){animation-delay:.6s}
+.recap-list li:nth-child(7){animation-delay:.7s}
+.recap-list li:nth-child(8){animation-delay:.8s}
+.recap-list .check{font-size:20px}
+.recap-list .concept{font-weight:700;color:#ff9a56;display:block;margin-bottom:2px}
+
+/* ===== FINAL SCREEN ===== */
+.final-screen{align-items:center;justify-content:center;text-align:center;gap:20px}
+.final-screen .trophy{font-size:80px;animation:float 3s ease-in-out infinite}
+.final-screen h2{font-size:28px;font-weight:900;background:linear-gradient(135deg,#ffd54f,#ff9a56);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.score-display{font-size:48px;font-weight:900;color:#4fc3f7}
+.score-display span{font-size:18px;color:rgba(255,255,255,.5)}
+.final-screen .cert-card{background:linear-gradient(145deg,rgba(255,215,0,.1),rgba(255,152,0,.05));border:2px solid rgba(255,215,0,.3);border-radius:20px;padding:24px;width:100%}
+.final-screen .cert-card h3{font-size:13px;text-transform:uppercase;letter-spacing:3px;color:#ffd54f;margin-bottom:8px}
+.final-screen .cert-card .cert-name{font-size:22px;font-weight:800;color:#fff;margin-bottom:4px}
+.final-screen .cert-card .cert-title{font-size:14px;color:rgba(255,255,255,.6)}
+.share-row{display:flex;gap:10px}
+
+/* ===== CONFETTI ===== */
+.confetti-container{position:fixed;inset:0;pointer-events:none;z-index:100;overflow:hidden}
+.confetti-piece{position:absolute;width:10px;height:10px;top:-10px;animation:confettiFall var(--fall-duration,3s) linear forwards}
+@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+/* ===== TIMER BAR ===== */
+.timer-bar{height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;margin-bottom:8px}
+.timer-bar .timer-fill{height:100%;background:linear-gradient(90deg,#4caf50,#ff9800,#f44336);border-radius:2px;transition:width .1s linear}
+
+/* ===== POINTS POPUP ===== */
+.points-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:32px;font-weight:900;color:#ffd54f;pointer-events:none;z-index:50;animation:pointsPop .8s ease forwards;text-shadow:0 2px 10px rgba(0,0,0,.5)}
+@keyframes pointsPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}60%{transform:translate(-50%,-70%) scale(1)}100%{opacity:0;transform:translate(-50%,-100%) scale(.8)}}
+
+/* ===== DAY TRACKER ===== */
+.day-tracker{display:flex;gap:4px;justify-content:center;padding:8px 0}
+.day-dot{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:rgba(255,255,255,.3);transition:all .3s}
+.day-dot.current{background:rgba(255,107,53,.3);color:#ff9a56;border:2px solid #ff6b35}
+.day-dot.past{background:rgba(76,175,80,.2);color:#66bb6a}
+.day-dot.future{opacity:.5}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:360px){
+  .landing h1{font-size:26px}
+  .landing h1 span{font-size:40px}
+  .invest-grid{gap:6px}
+  .invest-card{padding:8px 4px;font-size:11px}
+}
+</style>
+</head>
+<body>
+
+<!-- STARS BACKGROUND -->
+<div class="stars" id="stars"></div>
+
+<!-- GAME CONTAINER -->
+<div class="game" id="game">
+
+  <!-- TOP BAR -->
+  <div class="topbar" id="topbar">
+    <span class="player-name" id="playerNameDisplay"></span>
+    <div class="water-display"><span class="bottle-icon">💧</span><span id="waterCount">10</span></div>
+    <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <!-- SCREEN: LANDING -->
+  <div class="screen landing active" id="screenLanding">
+    <div class="mars-planet"></div>
+    <h1>Mission<span>Mars</span></h1>
+    <p class="tagline">An epic space adventure that will teach you the secrets of money, saving, and investing!</p>
+    <button class="btn btn-primary start-btn" onclick="showScreen('screenName')">Launch Mission</button>
+    <p style="font-size:11px;color:rgba(255,255,255,.4);margin-top:8px">An Investor Education Initiative</p>
+  </div>
+
+  <!-- SCREEN: NAME -->
+  <div class="screen name-screen" id="screenName">
+    <div class="astronaut-emoji">👩‍🚀</div>
+    <h2>Welcome, Astronaut!</h2>
+    <p>Enter your name to begin your mission to Mars. Your crew is counting on you!</p>
+    <div class="input-wrap">
+      <input type="text" id="playerNameInput" placeholder="Your name, Commander..." maxlength="20" autocomplete="off">
+    </div>
+    <button class="btn btn-primary" onclick="startMission()">Begin Mission</button>
+  </div>
+
+  <!-- SCREEN: INTRO STORY -->
+  <div class="screen story-screen" id="screenIntro">
+    <div class="story-card">
+      <div class="story-icon">🚀</div>
+      <h2>Your Mission Briefing</h2>
+      <p>Congratulations, <span class="highlight" id="storyName">Commander</span>! You've been selected for a <span class="highlight">10-day mission to Mars</span>.</p>
+      <p style="margin-top:12px">But survival on Mars isn't easy. You'll face challenges that test your ability to <span class="highlight">plan, save, and make smart decisions</span> with limited resources.</p>
+      <p style="margin-top:12px">On Mars, <span class="highlight">water is money</span>. Every decision you make about your water supply mirrors real-life financial choices.</p>
+    </div>
+    <div class="story-card">
+      <h2>Rules of Space</h2>
+      <ul class="rules-list">
+        <li>Your trip is <strong>10 days</strong> long</li>
+        <li>You receive <strong>2 water bottles daily</strong> for the first 5 days</li>
+        <li>For the remaining 5 days, you get <strong>NO water</strong></li>
+        <li>Total supply: <strong>10 bottles</strong> for 10 days</li>
+        <li>Teamwork is the key to survival!</li>
+        <li>Every choice you make earns you <strong>Mission Points</strong></li>
+      </ul>
+    </div>
+    <div class="story-nav">
+      <button class="btn btn-primary" onclick="startChallenge(1)">Accept Mission</button>
+    </div>
+  </div>
+
+  <!-- SCREEN: CHALLENGE (dynamic) -->
+  <div class="screen challenge-screen" id="screenChallenge"></div>
+
+  <!-- SCREEN: RECAP -->
+  <div class="screen recap-screen" id="screenRecap">
+    <div style="font-size:56px">🎓</div>
+    <h2>Mission Debrief</h2>
+    <p style="color:rgba(255,255,255,.7);font-size:14px;max-width:320px;line-height:1.5">Here's everything you learned on your journey to Mars. These lessons apply to real-life money decisions!</p>
+    <ul class="recap-list" id="recapList"></ul>
+    <button class="btn btn-primary" onclick="showFinal()" style="margin-top:8px">See My Results</button>
+  </div>
+
+  <!-- SCREEN: FINAL -->
+  <div class="screen final-screen" id="screenFinal">
+    <div class="trophy">🏆</div>
+    <h2>Mission Complete!</h2>
+    <div class="score-display"><span id="finalScore">0</span> <span>/ 800 pts</span></div>
+    <div class="cert-card">
+      <h3>Certificate of Completion</h3>
+      <div class="cert-name" id="certName">Commander</div>
+      <div class="cert-title" id="certTitle">Mars Financial Cadet</div>
+      <p style="font-size:12px;color:rgba(255,255,255,.5);margin-top:8px">has successfully completed the Mission Mars Financial Literacy Program</p>
+    </div>
+    <div class="share-row">
+      <button class="btn btn-primary btn-small" onclick="restartGame()">Play Again</button>
+    </div>
+    <p style="font-size:11px;color:rgba(255,255,255,.35);max-width:300px;line-height:1.4;margin-top:8px">Remember: Start early, plan wisely, and let compounding work its magic! Mutual fund investments are subject to market risks.</p>
+  </div>
+
+</div>
+
+<script>
+// ===== GAME STATE =====
+const state = {
+  name: '',
+  water: 10,
+  score: 0,
+  challenge: 0,
+  answers: {},
+  dailyConsumption: 1,
+  hasInsurance: false,
+  investmentPicks: []
+};
+
+// ===== STARS GENERATION =====
+(function(){
+  const c=document.getElementById('stars');
+  for(let i=0;i<80;i++){
+    const s=document.createElement('span');
+    const sz=Math.random()*3+1;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*4}s;animation-delay:${Math.random()*3}s`;
+    c.appendChild(s);
+  }
+})();
+
+// ===== SCREEN MANAGEMENT =====
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ===== START MISSION =====
+function startMission(){
+  const name=document.getElementById('playerNameInput').value.trim();
+  if(!name){document.getElementById('playerNameInput').focus();return}
+  state.name=name;
+  document.getElementById('storyName').textContent=name;
+  document.getElementById('playerNameDisplay').textContent=name;
+  showScreen('screenIntro');
+}
+document.getElementById('playerNameInput').addEventListener('keydown',e=>{if(e.key==='Enter')startMission()});
+
+// ===== CHALLENGE DEFINITIONS =====
+const challenges = [
+  // Challenge 1: Budgeting
+  {
+    id:1,
+    badge:'Challenge 1',
+    title:'Water Budgeting',
+    icon:'🧊',
+    scene:`You've arrived at the Mars Space Station! Your <span class="emphasis">10-day mission</span> begins now.<br><br>You'll receive <span class="emphasis">2 water bottles every day for the first 5 days</span>. That's 10 bottles total.<br><br>But here's the catch: for the <span class="emphasis">remaining 5 days, you get ZERO water</span>.`,
+    question:'How many bottles will you drink each day?',
+    type:'slider',
+    sliderMin:0.5,
+    sliderMax:2,
+    sliderStep:0.5,
+    sliderDefault:1,
+    sliderUnit:'bottle(s)/day',
+    evaluate(val){
+      state.dailyConsumption=val;
+      if(val<=1) return {score:100,type:'good',icon:'🌟',title:'Brilliant Planning!',msg:`Drinking ${val} bottle(s) per day means your 10 bottles last all 10 days! You planned perfectly.`,lesson:'This is like BUDGETING your salary. If you earn money for part of the year but need it all year, you must plan and save from the start. The key is: don\'t spend everything you earn today — save for tomorrow.'};
+      if(val<=1.5) return {score:60,type:'warn',icon:'😅',title:'Cutting It Close!',msg:`At ${val} bottles per day, you'll run out before day 10. You'll be thirsty on Mars!`,lesson:'This is what happens when we spend most of what we earn without saving enough. You survived, but just barely. Better planning = more comfort and security.'};
+      return {score:20,type:'bad',icon:'😰',title:'Water Crisis!',msg:`At ${val} bottles per day, you'll run out by day 5! The last 5 days will be very tough.`,lesson:'This is like spending your entire salary as soon as you get it. When expenses come later, you have nothing left. Always PLAN AHEAD and budget wisely.'};
+    }
+  },
+  // Challenge 2: Peer Pressure
+  {
+    id:2,
+    badge:'Challenge 2',
+    title:'Peer Pressure on Mars',
+    icon:'👫',
+    scene:`At the space station, you notice other kids drinking <span class="emphasis">3-4 bottles of water per day</span> and even wasting water!<br><br>They seem to be having a great time. They laugh at you for being careful with your water.`,
+    question:'Will you change your plan and drink more like them?',
+    type:'choice',
+    choices:[
+      {id:'stick',label:'Stick to my plan — 1 bottle per day',emoji:'🧠'},
+      {id:'increase',label:'Drink 2 bottles — enjoy a little more',emoji:'😊'},
+      {id:'match',label:'Match them — drink 3-4 bottles per day!',emoji:'🎉'},
+      {id:'less',label:'Drink even less — save extra for emergencies',emoji:'🛡️'}
+    ],
+    evaluate(val){
+      if(val==='stick') return {score:100,type:'good',icon:'🧠',title:'Strong Willpower!',msg:'You stuck to YOUR plan despite peer pressure. The other kids will run out of water soon — you won\'t!',lesson:'FOLLOW YOUR OWN FINANCIAL PLAN. When friends buy expensive things, it\'s tempting to copy them. But everyone\'s financial situation is different. Don\'t let peer pressure make you overspend. Stay disciplined!'};
+      if(val==='less') return {score:90,type:'good',icon:'🛡️',title:'Ultra Cautious!',msg:'Saving extra is smart! You\'ll have a buffer for emergencies. Just make sure you stay hydrated enough.',lesson:'Being extra cautious with money is wise, but don\'t forget to live a little too. The key is BALANCE — save enough for safety, but also enjoy the present responsibly.'};
+      if(val==='increase') return {score:40,type:'warn',icon:'😬',title:'Hmm, Risky Move!',msg:'Doubling your intake means you\'ll run low before the mission ends. The others influenced your decision!',lesson:'Peer pressure to spend more is real. "Everyone\'s buying it" is NOT a good reason to spend money. Make financial decisions based on YOUR budget, not what others do.'};
+      return {score:10,type:'bad',icon:'💸',title:'Water Wasted!',msg:'You drank like the others and now you\'re almost out of water by day 4! You followed the crowd into crisis.',lesson:'Copying others\' spending habits without knowing their situation is dangerous. They might have more resources, or they might be heading for trouble too. FOLLOW YOUR OWN PLAN.'};
+    }
+  },
+  // Challenge 3: Insurance
+  {
+    id:3,
+    badge:'Challenge 3',
+    title:'The Space Dog',
+    icon:'🐕‍🦺',
+    scene:`A friendly space dog appears! It wants to join your crew.<br><br>The <span class="emphasis">catch</span>: you must give it a <span class="emphasis">small sip of water daily</span>.<br><br>The <span class="emphasis">benefit</span>: the dog will <span class="emphasis">PROTECT your water bottles</span> from getting lost or stolen during the mission.`,
+    question:'Will you keep the dog and give it a sip daily?',
+    type:'choice',
+    choices:[
+      {id:'yes',label:'Yes! A small sip for protection is worth it',emoji:'🐕'},
+      {id:'no',label:'No way! I can\'t spare any water',emoji:'🚫'},
+      {id:'maybe',label:'I\'ll try it for a few days and see',emoji:'🤔'}
+    ],
+    evaluate(val){
+      state.hasInsurance=(val==='yes');
+      if(val==='yes') return {score:100,type:'good',icon:'🐕',title:'Smart Protection!',msg:'The dog costs a tiny sip daily but saves you from losing entire bottles! That\'s a great trade-off.',lesson:'This is exactly how INSURANCE works! You pay a small regular premium (the sip) to protect against big losses (stolen/lost bottles). Health insurance, life insurance — they all work this way. A small regular cost protects you from financial disaster.'};
+      if(val==='no') return {score:30,type:'warn',icon:'😟',title:'Risky Choice!',msg:'Without the dog, a thief steals 2 of your bottles on Day 6! If only you had that protection...',lesson:'Without INSURANCE, you\'re exposed to unexpected losses. People who skip insurance to save money often face much bigger costs when accidents, illness, or theft happen. Insurance is NOT optional — it\'s essential!'};
+      return {score:60,type:'warn',icon:'🤷',title:'Half Protection',msg:'You had the dog for a few days, but when you sent it away, you lost a bottle the very next day!',lesson:'Insurance only works if you keep it consistently. Starting and stopping coverage leaves gaps where bad things can happen. Get insurance and KEEP it active.'};
+    }
+  },
+  // Challenge 4: Ponzi / Fraud
+  {
+    id:4,
+    badge:'Challenge 4',
+    title:'Too Good To Be True?',
+    icon:'🎪',
+    scene:`You see a crowd gathered around a person on Mars. He's making an incredible offer:<br><br><span class="emphasis">"Give me 1 water bottle today, and I'll return 3 bottles tomorrow!"</span><br><br>Many kids are handing over their water. Some claim they already received 3 bottles back and are now giving ALL their bottles!`,
+    question:'What will you do?',
+    type:'choice',
+    choices:[
+      {id:'avoid',label:'Stay away — this sounds too good to be true!',emoji:'🚫'},
+      {id:'one',label:'Give just 1 bottle — can\'t hurt to try',emoji:'🤞'},
+      {id:'all',label:'Give all my bottles — imagine 3x return!',emoji:'🤑'},
+      {id:'investigate',label:'Ask more questions before deciding',emoji:'🔍'}
+    ],
+    evaluate(val){
+      if(val==='avoid') return {score:100,type:'good',icon:'🛡️',title:'Scam Avoided!',msg:'It WAS a scam! The person disappeared the next day with everyone\'s water. You saved yourself!',lesson:'If someone promises UNREALISTIC returns (like 3x overnight), it\'s almost certainly a FRAUD or PONZI SCHEME. In real life, scammers promise "double your money" or "guaranteed huge returns." Remember: if it sounds too good to be true, it IS. Stick with trusted, regulated investments.'};
+      if(val==='investigate') return {score:80,type:'good',icon:'🔍',title:'Smart Detective!',msg:'Your questions revealed the truth — nobody actually got 3 bottles. The "winners" were the scammer\'s friends acting!',lesson:'Always INVESTIGATE before investing. Ask questions, verify claims, check if the person/company is authorized. In real life, check if financial products are registered with SEBI or other regulators. Due diligence is your best protection.'};
+      if(val==='one') return {score:20,type:'bad',icon:'💧',title:'Bottle Lost!',msg:'That 1 bottle is gone forever. The scammer vanished overnight. At least you didn\'t give more!',lesson:'Even "just trying" with scammers means losing money. In real life, once you send money to a fraudster, it\'s usually gone. NEVER invest in unregistered, unverified schemes, no matter how small the amount.'};
+      return {score:0,type:'bad',icon:'😱',title:'Disaster!',msg:'ALL your water is gone! The scammer has vanished. You\'re now completely dependent on others for survival.',lesson:'Giving everything to a fraudulent scheme is financially devastating. People lose their life savings this way. NEVER put all your money in one place, especially an unverified one. Diversify, verify, and be skeptical of extraordinary promises.'};
+    }
+  },
+  // Challenge 5: Equity Investment
+  {
+    id:5,
+    badge:'Challenge 5',
+    title:'Build a Mars Company',
+    icon:'🏗️',
+    scene:`Some astronauts on Mars have started building companies — a water purification plant, a greenhouse, and a tech lab.<br><br>They need investors! You can <span class="emphasis">invest water bottles</span> in a company and if it does well, you'll get <span class="emphasis">MORE bottles back</span>. But if it fails, you <span class="emphasis">lose your investment</span>.`,
+    question:'Would you invest in a Mars company?',
+    type:'choice',
+    choices:[
+      {id:'invest',label:'Yes! I\'ll invest some water for a chance to grow',emoji:'📈'},
+      {id:'safe',label:'No — I\'ll keep all my water safe with me',emoji:'🏦'},
+      {id:'split',label:'Split it — invest some, keep some safe',emoji:'⚖️'}
+    ],
+    evaluate(val){
+      if(val==='split') return {score:100,type:'good',icon:'⚖️',title:'Perfect Balance!',msg:'You invested some and kept some safe. Your investment grew by 50%, AND you have safe reserves!',lesson:'This is the essence of ASSET ALLOCATION. In real life, put some money in EQUITY (stocks — higher growth, more risk) and some in FIXED INCOME (FDs, bonds — safe, lower growth). The stock market (Sensex) has grown massively over time, but it goes up and down. Fixed deposits are safe but grow slowly. A MIX of both is ideal!'};
+      if(val==='invest') return {score:70,type:'warn',icon:'📈',title:'Bold Move!',msg:'The company did well and your water grew! But it was risky — if it had failed, you\'d have nothing.',lesson:'EQUITY INVESTING (buying company shares/stocks) can give great returns, but carries risk. The stock market grows over the long term but has ups and downs. Never invest ALL your money in stocks. Keep some safe in fixed deposits or bonds too.'};
+      return {score:50,type:'warn',icon:'🏦',title:'Too Safe!',msg:'Your water is safe, but it didn\'t grow at all. Meanwhile, others who invested wisely doubled their supply!',lesson:'Keeping all money in a savings account or under the mattress feels safe, but INFLATION eats its value over time. Your money needs to GROW. Fixed deposits give steady returns, but equity (stocks) gives much higher growth over the long term. Don\'t be too scared to invest!'};
+    }
+  },
+  // Challenge 6: Mutual Funds / Diversification
+  {
+    id:6,
+    badge:'Challenge 6',
+    title:'Diversify Your Investments',
+    icon:'🎯',
+    scene:`Mars now has <span class="emphasis">9 different industries</span>. You can invest your water in any of them. But here's the catch — some will <span class="emphasis">succeed</span> and some will <span class="emphasis">fail</span>. You don't know which ones!`,
+    question:'Pick the industries you want to invest in. (Tap to select)',
+    type:'invest-grid',
+    industries:[
+      {id:'pharma',name:'Pharma Lab',icon:'🧪',wins:true},
+      {id:'logistics',name:'Logistics',icon:'📦',wins:false},
+      {id:'tech',name:'Technology',icon:'💻',wins:true},
+      {id:'food',name:'Food Court',icon:'🍽️',wins:false},
+      {id:'energy',name:'Energy Grid',icon:'⚡',wins:true},
+      {id:'realestate',name:'Real Estate',icon:'🏢',wins:false},
+      {id:'manufacturing',name:'Manufacturing',icon:'🏭',wins:true},
+      {id:'tourism',name:'Tourism',icon:'✈️',wins:false},
+      {id:'transport',name:'Transport',icon:'🚀',wins:true}
+    ],
+    evaluate(picks){
+      state.investmentPicks=picks;
+      const winners=this.industries.filter(i=>i.wins).map(i=>i.id);
+      const hits=picks.filter(p=>winners.includes(p)).length;
+      const misses=picks.filter(p=>!winners.includes(p)).length;
+      const total=picks.length;
+      if(total===0) return {score:10,type:'bad',icon:'😶',title:'No Investment?',msg:'You didn\'t invest in anything! Your water stayed the same while others grew theirs.',lesson:'Not investing at all means missing out on growth. A MUTUAL FUND solves the problem of choosing — professional fund managers pick a diverse basket of companies for you, so you don\'t have to pick winners yourself.'};
+      if(total>=5){
+        return {score:100,type:'good',icon:'🌟',title:'Great Diversification!',msg:`You picked ${total} industries! Even though ${misses} failed, your ${hits} winners MORE than made up for it. That's the power of spreading your bets!`,lesson:'This is EXACTLY how MUTUAL FUNDS work! When you invest in a mutual fund, a professional Fund Manager invests your money across MANY companies and sectors. Some go up, some go down, but overall your portfolio grows. You don\'t need to pick individual winners — the fund does it for you!'};
+      }
+      if(hits>misses) return {score:70,type:'good',icon:'📊',title:'Good Picks!',msg:`${hits} of your ${total} picks were winners! But picking just a few is risky.`,lesson:'You got lucky with some picks, but choosing individual stocks is hard even for experts. MUTUAL FUNDS spread your investment across many companies, reducing risk. Professional fund managers research and pick stocks for you.'};
+      return {score:40,type:'warn',icon:'😬',title:'Mixed Results',msg:`Only ${hits} of your ${total} picks succeeded. The losses hurt.`,lesson:'Picking individual companies is very difficult. This is why MUTUAL FUNDS exist — they invest across dozens of companies so one failure doesn\'t ruin you. A fund manager handles the research and selection. It\'s like having a professional pilot instead of flying yourself!'};
+    }
+  },
+  // Challenge 7: Compounding
+  {
+    id:7,
+    badge:'Challenge 7',
+    title:'The Magic Plant',
+    icon:'🌱',
+    scene:`Your mission is to make part of Mars <span class="emphasis">green</span>! You've planted a special tree.<br><br>On Day 1, it's just <span class="emphasis">0.5 feet</span> tall.<br>It <span class="emphasis">doubles in size every day</span>.<br>Goal: reach <span class="emphasis">100+ feet in 10 days</span>.`,
+    question:'Do you think this tiny plant can reach 100 feet in 10 days?',
+    type:'choice',
+    choices:[
+      {id:'yes',label:'Yes — doubling adds up fast!',emoji:'✅'},
+      {id:'no',label:'No way — 0.5 feet is too small to reach 100',emoji:'❌'},
+      {id:'unsure',label:'Maybe? I\'m not sure about the math',emoji:'🤔'}
+    ],
+    evaluate(val){
+      const days=[0.5,1,2,4,8,16,32,64,128,256];
+      if(val==='yes') return {score:100,type:'good',icon:'🌳',title:'You Understand Compounding!',msg:`YES! 0.5 → 1 → 2 → 4 → 8 → 16 → 32 → 64 → 128 → 256 feet! By Day 10, it's 256 feet — WAY past 100!`,lesson:'This is the POWER OF COMPOUNDING! Small amounts growing consistently become HUGE over time. If you start investing even ₹500/month at age 15, by age 60 it can grow to crores! Albert Einstein called compound interest the "8th wonder of the world." START EARLY, and let time do the heavy lifting.',days};
+      if(val==='unsure') return {score:60,type:'warn',icon:'🤯',title:'Surprise!',msg:`It DOES reach 100! Watch: 0.5 → 1 → 2 → 4 → 8 → 16 → 32 → 64 → 128 → 256! The growth is explosive!`,lesson:'Compounding feels slow at first, then EXPLODES. This is why starting early is crucial. An investment of ₹500/month from age 15 will be MUCH larger than ₹5,000/month starting at age 40. Time is your biggest ally in building wealth.',days};
+      return {score:30,type:'warn',icon:'😲',title:'Think Again!',msg:`It ABSOLUTELY reaches 100! Here's the math: 0.5 → 1 → 2 → 4 → 8 → 16 → 32 → 64 → 128 → 256 feet by Day 10!`,lesson:'People often underestimate compounding because the early growth looks small. But it\'s EXPONENTIAL. Starting early means your money has more time to double again and again. This is why STARTING EARLY is the #1 rule of investing.',days};
+    }
+  },
+  // Challenge 8: SIP
+  {
+    id:8,
+    badge:'Challenge 8',
+    title:'Systematic Investment',
+    icon:'💧',
+    scene:`It's the final challenge! You've learned about saving, investing, and growing your resources.<br><br>Now imagine: instead of getting all 10 bottles at once, what if you <span class="emphasis">saved 1 bottle every single day</span>, consistently, no matter what?<br><br>On some days water is cheap (plentiful), on other days it's expensive (scarce).`,
+    question:'What\'s better: investing a lump sum all at once, or a small fixed amount regularly?',
+    type:'choice',
+    choices:[
+      {id:'sip',label:'Small regular amounts — steady and disciplined',emoji:'📅'},
+      {id:'lump',label:'All at once — go big or go home!',emoji:'💰'},
+      {id:'wait',label:'Wait for the "right time" to invest',emoji:'⏳'}
+    ],
+    evaluate(val){
+      if(val==='sip') return {score:100,type:'good',icon:'📅',title:'SIP Champion!',msg:'Investing a fixed amount regularly is called SIP (Systematic Investment Plan). It\'s the smartest strategy because you buy more when prices are low and less when prices are high!',lesson:'A SIP (Systematic Investment Plan) means you invest a FIXED amount regularly (monthly). When markets are down, your money buys more units. When markets are up, your existing units are worth more. Over time, this "rupee cost averaging" gives great returns WITHOUT needing to time the market. Even ₹500/month can build enormous wealth!'};
+      if(val==='lump') return {score:40,type:'warn',icon:'📊',title:'Timing Risk!',msg:'Investing everything at once is risky — what if you invest on a day when prices are at their highest? You\'d lose a lot!',lesson:'Lump sum investing CAN work, but it\'s risky because you might invest at a market peak. SIP (Systematic Investment Plan) removes this timing risk by spreading your investment over time. Most successful investors use SIP for long-term wealth building.'};
+      return {score:20,type:'bad',icon:'⏳',title:'Still Waiting?',msg:'The "right time" never comes! While you waited, others who invested regularly have already grown their wealth.',lesson:'Waiting for the "perfect time" to invest is a trap. Nobody can predict markets. The best time to start investing was yesterday. The second best time is TODAY. Start a SIP (Systematic Investment Plan) and let time and compounding do their magic!'};
+    }
+  }
+];
+
+// ===== CHALLENGE RENDERING =====
+function startChallenge(n){
+  state.challenge=n;
+  document.getElementById('topbar').classList.add('active');
+  updateTopbar();
+  const ch=challenges[n-1];
+  renderChallenge(ch);
+  showScreen('screenChallenge');
+}
+
+function updateTopbar(){
+  document.getElementById('waterCount').textContent=state.water;
+  document.getElementById('progressFill').style.width=((state.challenge/8)*100)+'%';
+}
+
+function renderChallenge(ch){
+  const el=document.getElementById('screenChallenge');
+  let html=`
+    <div class="challenge-header">
+      <div class="challenge-badge">${ch.badge}</div>
+      <h2>${ch.title}</h2>
+    </div>
+    <div class="challenge-scene">
+      <div class="scene-icon">${ch.icon}</div>
+      <p>${ch.scene}</p>
+    </div>
+    <div class="challenge-question">${ch.question}</div>
+  `;
+
+  if(ch.type==='slider'){
+    html+=`
+      <div class="slider-input">
+        <div class="slider-value" id="sliderVal">${ch.sliderDefault}</div>
+        <div class="slider-label">${ch.sliderUnit}</div>
+        <input type="range" min="${ch.sliderMin}" max="${ch.sliderMax}" step="${ch.sliderStep}" value="${ch.sliderDefault}" id="sliderInput" oninput="document.getElementById('sliderVal').textContent=this.value">
+      </div>
+      <div class="water-viz" id="waterViz"></div>
+      <button class="btn btn-primary" style="align-self:center" onclick="submitSlider(${ch.id})">Lock In My Choice</button>
+    `;
+  } else if(ch.type==='choice'){
+    html+=`<div class="choices" id="choiceContainer">`;
+    const letters='ABCD';
+    ch.choices.forEach((c,i)=>{
+      html+=`<button class="choice-btn" data-id="${c.id}" onclick="selectChoice(this,'${c.id}',${ch.id})">
+        <span class="choice-letter">${letters[i]}</span>
+        <span>${c.emoji} ${c.label}</span>
+      </button>`;
+    });
+    html+=`</div>`;
+  } else if(ch.type==='invest-grid'){
+    html+=`<div class="invest-grid" id="investGrid">`;
+    ch.industries.forEach(ind=>{
+      html+=`<div class="invest-card" data-id="${ind.id}" onclick="toggleInvest(this,'${ind.id}')">
+        <div class="invest-icon">${ind.icon}</div>
+        <div>${ind.name}</div>
+      </div>`;
+    });
+    html+=`</div>
+    <p class="invest-hint">Select multiple industries to diversify!</p>
+    <button class="btn btn-primary btn-small" style="align-self:center;margin-top:8px" onclick="submitInvestment(${ch.id})">Invest Now</button>`;
+  }
+
+  html+=`<div id="feedbackArea"></div>`;
+  el.innerHTML=html;
+
+  if(ch.type==='slider') updateWaterViz(ch.sliderDefault);
+  if(ch.type==='slider'){
+    document.getElementById('sliderInput').addEventListener('input',function(){
+      updateWaterViz(parseFloat(this.value));
+    });
+  }
+}
+
+function updateWaterViz(rate){
+  const el=document.getElementById('waterViz');
+  if(!el)return;
+  let html='';
+  const total=10;
+  const consumed=Math.floor(rate*10);
+  for(let i=0;i<total;i++){
+    html+=`<div class="bottle ${i<consumed?'consumed':'filled'}"></div>`;
+  }
+  el.innerHTML=html;
+}
+
+let selectedChoice=null;
+function selectChoice(btn,id,chId){
+  if(document.querySelector('#feedbackArea .feedback'))return;
+  document.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedChoice=id;
+  setTimeout(()=>submitChoice(chId),300);
+}
+
+function submitChoice(chId){
+  if(!selectedChoice)return;
+  const ch=challenges[chId-1];
+  const result=ch.evaluate(selectedChoice);
+  state.answers[chId]=selectedChoice;
+  state.score+=result.score;
+  showFeedback(result,chId);
+  selectedChoice=null;
+}
+
+function submitSlider(chId){
+  const val=parseFloat(document.getElementById('sliderInput').value);
+  const ch=challenges[chId-1];
+  const result=ch.evaluate(val);
+  state.answers[chId]=val;
+  state.score+=result.score;
+  document.querySelector('.slider-input').style.pointerEvents='none';
+  document.querySelector('.slider-input').style.opacity='.5';
+  showFeedback(result,chId);
+}
+
+let investPicks=[];
+function toggleInvest(el,id){
+  if(document.querySelector('#feedbackArea .feedback'))return;
+  if(investPicks.includes(id)){
+    investPicks=investPicks.filter(x=>x!==id);
+    el.classList.remove('selected');
+  } else {
+    investPicks.push(id);
+    el.classList.add('selected');
+  }
+}
+
+function submitInvestment(chId){
+  if(document.querySelector('#feedbackArea .feedback'))return;
+  const ch=challenges[chId-1];
+  const result=ch.evaluate(investPicks);
+  state.answers[chId]=investPicks.slice();
+  state.score+=result.score;
+  // Show winners/losers
+  ch.industries.forEach(ind=>{
+    const card=document.querySelector(`.invest-card[data-id="${ind.id}"]`);
+    if(ind.wins) card.classList.add('winner');
+    else card.classList.add('loser');
+    card.style.pointerEvents='none';
+  });
+  showFeedback(result,chId);
+  investPicks=[];
+}
+
+function showFeedback(result,chId){
+  showPointsPopup(result.score);
+  const el=document.getElementById('feedbackArea');
+  let compoundHtml='';
+  if(result.days){
+    compoundHtml=`<div class="compound-viz" id="compoundViz"></div>`;
+  }
+  el.innerHTML=`
+    <div class="feedback">
+      <div class="feedback-card ${result.type}">
+        <div class="feedback-icon">${result.icon}</div>
+        <h3>${result.title}</h3>
+        <p>${result.msg}</p>
+      </div>
+      ${compoundHtml}
+      <div class="lesson-box">
+        <div class="lesson-title">💡 Real-Life Money Lesson</div>
+        <p>${result.lesson}</p>
+      </div>
+      <div style="text-align:center;margin-top:16px">
+        <button class="btn btn-primary" onclick="nextChallenge(${chId})">${chId<8?'Next Challenge →':'Mission Complete →'}</button>
+      </div>
+    </div>
+  `;
+  if(result.days) animateCompound(result.days);
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+  updateTopbar();
+}
+
+function animateCompound(days){
+  const viz=document.getElementById('compoundViz');
+  if(!viz)return;
+  const max=Math.max(...days);
+  days.forEach((val,i)=>{
+    const bar=document.createElement('div');
+    bar.className='compound-bar';
+    bar.style.height='0px';
+    bar.innerHTML=`<span class="bar-label">D${i+1}</span><span class="bar-value">${val}ft</span>`;
+    viz.appendChild(bar);
+    setTimeout(()=>{
+      bar.style.height=Math.max(4,(val/max)*140)+'px';
+    },200+i*150);
+  });
+}
+
+function showPointsPopup(pts){
+  const popup=document.createElement('div');
+  popup.className='points-popup';
+  popup.textContent=`+${pts} pts`;
+  document.body.appendChild(popup);
+  setTimeout(()=>popup.remove(),1000);
+}
+
+function nextChallenge(current){
+  if(current<8){
+    startChallenge(current+1);
+  } else {
+    showRecap();
+  }
+}
+
+// ===== RECAP =====
+const recapItems=[
+  {concept:'Plan & Start Early',lesson:'Budget your resources and start saving from day one'},
+  {concept:'Follow Your Own Plan',lesson:'Don\'t let peer pressure change your financial decisions'},
+  {concept:'Insurance is a Must',lesson:'Pay a small cost regularly to protect against big losses'},
+  {concept:'Avoid Fraud',lesson:'If returns sound too good to be true, they probably are'},
+  {concept:'Equity Investing',lesson:'Invest in companies for growth — accept some ups & downs'},
+  {concept:'Mutual Funds & Diversification',lesson:'Spread investments across many companies to reduce risk'},
+  {concept:'Power of Compounding',lesson:'Small amounts grow exponentially over time — start early!'},
+  {concept:'SIP — Systematic Investment',lesson:'Invest a fixed amount regularly for the best long-term results'}
+];
+
+function showRecap(){
+  const list=document.getElementById('recapList');
+  list.innerHTML=recapItems.map((r,i)=>`
+    <li style="animation-delay:${i*0.1}s">
+      <span class="check">✅</span>
+      <div><span class="concept">${r.concept}</span>${r.lesson}</div>
+    </li>
+  `).join('');
+  showScreen('screenRecap');
+}
+
+function showFinal(){
+  document.getElementById('finalScore').textContent=state.score;
+  document.getElementById('certName').textContent=state.name;
+  let title='Mars Financial Cadet';
+  if(state.score>=600) title='Mars Financial Commander';
+  if(state.score>=700) title='Mars Financial Expert';
+  if(state.score>=750) title='Mars Financial Legend';
+  document.getElementById('certTitle').textContent=title;
+  showScreen('screenFinal');
+  launchConfetti();
+}
+
+// ===== CONFETTI =====
+function launchConfetti(){
+  const container=document.createElement('div');
+  container.className='confetti-container';
+  document.body.appendChild(container);
+  const colors=['#ff6b35','#4fc3f7','#ffd54f','#66bb6a','#ff4444','#9c27b0'];
+  for(let i=0;i<60;i++){
+    const p=document.createElement('div');
+    p.className='confetti-piece';
+    const c=colors[Math.floor(Math.random()*colors.length)];
+    const sz=Math.random()*8+6;
+    const shapes=['50%','0'];
+    p.style.cssText=`left:${Math.random()*100}%;width:${sz}px;height:${sz}px;background:${c};border-radius:${shapes[Math.floor(Math.random()*2)]};--fall-duration:${2+Math.random()*2}s;animation-delay:${Math.random()*1}s`;
+    container.appendChild(p);
+  }
+  setTimeout(()=>container.remove(),4000);
+}
+
+// ===== RESTART =====
+function restartGame(){
+  state.name='';state.water=10;state.score=0;state.challenge=0;state.answers={};
+  state.dailyConsumption=1;state.hasInsurance=false;state.investmentPicks=[];
+  investPicks=[];selectedChoice=null;
+  document.getElementById('topbar').classList.remove('active');
+  document.getElementById('playerNameInput').value='';
+  showScreen('screenLanding');
+}
+</script>
+</body>
+</html>

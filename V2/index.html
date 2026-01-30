@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1">
+<title>Mission Mars — Financial Literacy Adventure</title>
+<meta name="description" content="An interactive space-themed game that teaches children financial literacy, saving, investing, and money management.">
+<meta name="theme-color" content="#0a0e27">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ===== STARFIELD CANVAS ===== -->
+<canvas id="starfield"></canvas>
+
+<!-- ===== AUDIO (optional ambient) ===== -->
+<div id="audioToggle" class="audio-toggle" onclick="toggleAudio()" title="Toggle Sound">
+  <span id="audioIcon">🔇</span>
+</div>
+
+<!-- ===== GAME SHELL ===== -->
+<div class="game" id="game">
+
+  <!-- TOP HUD -->
+  <header class="hud" id="hud">
+    <div class="hud-left">
+      <span class="hud-avatar" id="hudAvatar">👩‍🚀</span>
+      <span class="hud-name" id="hudName"></span>
+    </div>
+    <div class="hud-center">
+      <div class="hud-water">
+        <div class="hud-water-bar">
+          <div class="hud-water-fill" id="hudWaterFill"></div>
+        </div>
+        <span class="hud-water-text">💧 <span id="hudWaterNum">10</span></span>
+      </div>
+    </div>
+    <div class="hud-right">
+      <div class="hud-score">⭐ <span id="hudScore">0</span></div>
+      <div class="hud-day" id="hudDay">Day 1</div>
+    </div>
+  </header>
+
+  <!-- PROGRESS RAIL -->
+  <div class="progress-rail" id="progressRail">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-steps" id="progressSteps"></div>
+  </div>
+
+  <!-- ===== SCREEN CONTAINER ===== -->
+  <main class="screen-container" id="screenContainer">
+    <!-- Screens injected dynamically -->
+  </main>
+
+  <!-- ===== BOTTOM NAV ===== -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-btn" id="navPrev" onclick="navPrev()" disabled>← Back</button>
+    <button class="nav-btn nav-btn-primary" id="navNext" onclick="navNext()">Continue →</button>
+  </nav>
+
+</div>
+
+<!-- ===== OVERLAY / MODAL ===== -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<!-- ===== CONFETTI LAYER ===== -->
+<canvas id="confettiCanvas"></canvas>
+
+<!-- ===== NOTIFICATION TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<script src="game-data.js"></script>
+<script src="game-engine.js"></script>
+</body>
+</html>
