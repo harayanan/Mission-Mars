@@ -4,6 +4,50 @@ All notable changes to Mission Mars are documented here.
 
 ---
 
+## [v3.0] — 2026-01-31
+
+### Added
+
+#### Badge & Achievement System
+- 12 earnable badges: Water Wise, Budget Boss, Insurance Pro, Scam Spotter, Market Maven, Diversity Champion, Compound King, SIP Star, Speed Demon, Quiz Master, Perfect Score, Early Bird
+- Badges earned through gameplay decisions, quiz performance, and speed
+- Badge grid display on recap and certificate screens
+- Speed Demon badge for answering quiz in under 5 seconds
+
+#### New Interactive Mini-Games
+- **Needs vs Wants sorting game** in Challenge 1: drag/tap 12 items into Needs or Wants categories with animated feedback
+- **Inflation impact table** in Challenge 5: visual comparison of how ₹100 loses purchasing power over 10/20/30 years
+- **Early vs Late investor comparison** in Challenge 7: side-by-side chart showing starting at 15 vs 25
+- **SIP growth chart** in Challenge 8: animated bar chart showing SIP returns over 5/10/15/20/25 years
+- **Market crash scenarios** in Challenge 8: historical Sensex crash and recovery data (2008, 2020, 2022)
+
+#### Timed Quiz System
+- Quiz timer bar with 15-second countdown and visual progress
+- Speed bonus (+10 points) for answers under 5 seconds
+- Timer animation with color transition (green → red)
+
+#### Expanded Content & Research
+- Deeper financial lessons with real HDFC Mutual Fund program context
+- 15 curated "Did You Know?" bonus facts (up from 8)
+- More detailed real-world Indian financial examples
+- Enhanced narrative dialogue with richer character interactions
+- ~4,400 lines of code (up from ~2,150 in V2), zero external dependencies
+
+#### UI Enhancements
+- New CSS styles for mini-games: `.nw-game`, `.nw-item`, `.inflation-table`, `.sip-chart`, `.badge-grid`, `.badge-item`
+- Emotion scenario cards and comparison cards
+- Step indicators for multi-part challenges
+- Next steps section on certificate screen
+- New animations: `slideRight`, `flipIn`, `popIn`
+
+### Changed
+- Game engine rewritten with badge system integration and mini-game renderers
+- Challenge phases now include `badgeId` linking to earnable badges
+- Quiz system upgraded from simple modal to timed challenge with speed tracking
+- Game data expanded from ~635 lines to ~1,800+ lines with richer content
+
+---
+
 ## [v2.0] — 2026-01-30
 
 ### Added
