@@ -161,7 +161,7 @@ const PHASES = [
     badge: 'Challenge 1 of 8',
     title: 'Water Budgeting',
     day: '1',
-    badgeId: 'budget_master',
+    badgeId: 'budgeteer',
     miniGame: 'needsVsWants',
     concept: 'Budgeting',
     intro: {
@@ -231,7 +231,7 @@ const PHASES = [
     badge: 'Challenge 2 of 8',
     title: 'Peer Pressure on Mars',
     day: '3',
-    badgeId: 'peer_proof',
+    badgeId: 'independent',
     concept: 'Financial Discipline',
     intro: {
       icon: '👫',
@@ -369,7 +369,7 @@ const PHASES = [
     badge: 'Challenge 4 of 8',
     title: 'The Great Mars Scam',
     day: '5',
-    badgeId: 'scam_spotter',
+    badgeId: 'scam-detector',
     concept: 'Fraud Awareness',
     intro: {
       icon: '🎪',
@@ -443,7 +443,7 @@ const PHASES = [
     badge: 'Challenge 5 of 8',
     title: 'Mars Companies & Investing',
     day: '6',
-    badgeId: 'smart_investor',
+    badgeId: 'investor',
     showInflationTable: true,
     concept: 'Equity & Fixed Income',
     intro: {
@@ -596,7 +596,7 @@ const PHASES = [
     badge: 'Challenge 7 of 8',
     title: 'The Magic of Compounding',
     day: '8',
-    badgeId: 'compound_king',
+    badgeId: 'compound-king',
     showEarlyVsLate: true,
     concept: 'Compounding',
     intro: {
@@ -661,7 +661,7 @@ const PHASES = [
     badge: 'Challenge 8 of 8 — FINAL',
     title: 'The SIP Strategy',
     day: '9',
-    badgeId: 'sip_champion',
+    badgeId: 'sip-champion',
     showSipChart: true,
     showMarketScenarios: true,
     concept: 'SIP',

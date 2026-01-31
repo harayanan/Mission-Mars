@@ -122,13 +122,15 @@ function earnBadge(badgeId) {
 }
 
 function checkAutoBadges() {
+  // First step
+  if (Object.keys(G.answers).filter(k => !k.startsWith('_')).length >= 1) earnBadge('first-step');
   // Quiz ace: 5+ quizzes correct
   const quizCorrect = Object.keys(G.quizDone).filter(k => G.quizDone[k] === 'correct').length;
-  if (quizCorrect >= 5) earnBadge('quiz_ace');
-  // Perfect score
-  if (G.score >= 1000) earnBadge('perfect_score');
-  // Explorer
-  if (Object.keys(G.answers).length >= 8) earnBadge('explorer');
+  if (quizCorrect >= 5) earnBadge('quiz-ace');
+  // Perfect quiz
+  if (quizCorrect >= 8) earnBadge('perfect-quiz');
+  // Mission complete
+  if (Object.keys(G.answers).filter(k => !k.startsWith('_')).length >= 8) earnBadge('mission-complete');
 }
 
 function renderBadgeGrid() {
@@ -336,9 +338,9 @@ function renderInflationTable() {
     <div class="card-icon">📈</div>
     <div class="card-title">How Inflation Eats Your Money</div>
     <table class="inflation-table">
-      <tr><th>Item</th><th>1990 Price</th><th>2024 Price</th></tr>`;
+      <tr><th>Item</th><th>1990</th><th>2024</th></tr>`;
   INFLATION_EXAMPLES.forEach(ex => {
-    html += `<tr><td>${ex.icon} ${ex.item}</td><td class="price-old">${ex.price1990}</td><td class="price-new">${ex.price2024}</td></tr>`;
+    html += `<tr><td>${ex.icon} ${ex.item}</td><td class="price-old">${ex.year1990}</td><td class="price-new">${ex.year2024}</td></tr>`;
   });
   html += `</table>
     <p style="font-size:11px;color:rgba(255,255,255,.4);margin-top:8px;text-align:center">This is why your investments must beat inflation (5-6%/year)!</p>
@@ -349,18 +351,19 @@ function renderInflationTable() {
 // ===== SIP CHART =====
 function renderSipChart() {
   const s = SIP_SCENARIOS;
+  const milestones = s.milestones;
   let html = `<div class="card anim-slide" style="margin:14px 0">
     <div class="card-icon">📊</div>
-    <div class="card-title">₹5,000/month SIP at 12% Returns</div>
+    <div class="card-title">₹${s.monthly}/month SIP at ${s.rate}% Returns</div>
     <div class="sip-chart" id="sipChart">`;
-  s.years.forEach((yr, i) => {
+  milestones.forEach((m, i) => {
     html += `<div class="sip-col">
       <div class="sip-val" id="sipVal${i}">₹0</div>
       <div style="display:flex;flex-direction:column;width:100%">
         <div class="sip-bar-returns" id="sipBarR${i}" style="height:0px;border-radius:4px 4px 0 0"></div>
         <div class="sip-bar-invested" id="sipBarI${i}" style="height:0px"></div>
       </div>
-      <div class="sip-label">${yr}Y</div>
+      <div class="sip-label">${m.years}Y</div>
     </div>`;
   });
   html += `</div>
@@ -373,21 +376,21 @@ function renderSipChart() {
 }
 
 function animateSipChart() {
-  const s = SIP_SCENARIOS;
-  const maxVal = Math.max(...s.value);
+  const milestones = SIP_SCENARIOS.milestones;
+  const maxVal = Math.max(...milestones.map(m => m.value));
   const maxH = 150;
-  s.years.forEach((yr, i) => {
+  milestones.forEach((m, i) => {
     setTimeout(() => {
-      const investedH = Math.max(4, (s.invested[i] / maxVal) * maxH);
-      const returnsH = Math.max(4, ((s.value[i] - s.invested[i]) / maxVal) * maxH);
+      const investedH = Math.max(4, (m.invested / maxVal) * maxH);
+      const returnsH = Math.max(4, ((m.value - m.invested) / maxVal) * maxH);
       const barI = document.getElementById('sipBarI' + i);
       const barR = document.getElementById('sipBarR' + i);
       const valEl = document.getElementById('sipVal' + i);
       if (barI) barI.style.height = investedH + 'px';
       if (barR) barR.style.height = returnsH + 'px';
       if (valEl) {
-        const lakhs = (s.value[i] / 100000).toFixed(1);
-        valEl.textContent = lakhs >= 100 ? `₹${(s.value[i]/10000000).toFixed(1)}Cr` : `₹${lakhs}L`;
+        const lakhs = (m.value / 100000).toFixed(1);
+        valEl.textContent = lakhs >= 100 ? `₹${(m.value/10000000).toFixed(1)}Cr` : `₹${lakhs}L`;
       }
     }, 200 + i * 250);
   });
@@ -407,7 +410,7 @@ function renderEarlyVsLate() {
       </div>
       <div class="compare-col compare-late">
         <h4>Start at ${e.late.startAge}</h4>
-        <div class="compare-stat">Invests age ${e.late.startAge}-${e.late.stopAge}<br><strong>₹${(e.late.totalInvested/100000).toFixed(0)}L invested</strong></div>
+        <div class="compare-stat">Invests age ${e.late.startAge}-60<br><strong>₹${(e.late.totalInvested/100000).toFixed(0)}L invested</strong></div>
         <div class="compare-stat" style="margin-top:8px">Value at 60:<br><strong style="color:#ffa726">${e.late.valueAt60}</strong></div>
       </div>
     </div>
@@ -869,7 +872,7 @@ function answerQuiz(phaseId, choiceId, correct, bonus) {
   // V3: Speed bonus
   if (correct && elapsed < 5) {
     pts += 10;
-    earnBadge('speed_demon');
+    // Speed bonus earned
   }
 
   G.score += pts;

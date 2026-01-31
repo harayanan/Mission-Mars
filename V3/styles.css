@@ -738,4 +738,16 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.15)}
   display:flex;align-items:center;justify-content:center;
   font-size:11px;font-weight:800;
 }
-</style>
+
+/* ===== SPACING FIXES ===== */
+.narrative+.narrative{margin-top:-4px}
+.narrative+.card,.card+.card{margin-top:2px}
+.dialogue{margin:12px 0}
+.card+.dialogue,.dialogue+.card{margin-top:12px}
+.feedback-card{margin-top:16px;margin-bottom:12px}
+.lesson-box+.realworld-box{margin-top:12px}
+.choices-list{margin:12px 0}
+.slider-group{margin:8px 0}
+.invest-grid{margin:12px 0}
+.bottle-row{margin:8px 0}
+.day-timeline{margin:8px 0}
