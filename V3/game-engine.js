@@ -1105,7 +1105,7 @@ function renderLanding() {
 function showNameEntry() {
   showHud(false); showNav(false);
 
-  let avatarHtml = AVATARS.map((a, i) => `<button class="avatar-option ${i===0?'picked':''}" data-avatar="${a}" onclick="pickAvatar(this,'${a}')">${a}</button>`).join('');
+  let avatarHtml = AVATARS.map((a, i) => `<button class="avatar-option ${i===0?'picked':''}" data-avatar="${a.emoji}" onclick="pickAvatar(this,'${a.emoji}')">${a.emoji}</button>`).join('');
 
   const html = `<div class="name-entry">
     <div style="font-size:11px;text-transform:uppercase;letter-spacing:3px;color:rgba(255,255,255,.4);font-weight:700" class="anim-slide">Choose Your Avatar</div>
