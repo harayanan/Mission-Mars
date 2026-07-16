@@ -39,6 +39,14 @@ Mission-Mars/
 
 Open `V3/index.html` (or any version) in a browser. No build step required.
 
+## Deployment (V3)
+
+- **Live URL:** https://mission-mars.xisunknown.com (public, no auth)
+- **Server:** `server.py` — static file server serving the `V3/` directory
+- **Port:** 9102 (Cloudflare tunnel → localhost:9102)
+- **Systemd:** `mission-mars-server.service` — enabled, auto-starts on boot, restarts on failure
+- **Manage:** `systemctl {status,restart,stop} mission-mars-server`
+
 ## Notes
 
 - Git repo with remote origin configured
